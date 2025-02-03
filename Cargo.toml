@@ -1,0 +1,24 @@
+[package]
+name = "exploration-mechanisms"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+mahf = "0.1.0"
+mahf-bmf = "0.1.0"
+mahf-coco = { git = "https://github.com/mahf-opt/mahf-coco", branch = "accelerated-fix" }
+anyhow = "1.0.79"
+eyre = "0.6.8"
+itertools = "0.10.5"
+rayon = "1.7.0"
+indicatif = { version = "0.17.4", features = ["rayon"] }
+scoped_threadpool = "0.1.9"
+once_cell = "1.18.0"
+clap = { version = "4.5.11", features = ["derive"] }
+
+[patch.crates-io]
+mahf = { git = "https://github.com/mahf-opt/mahf", branch = "exploration-operators" }
+
+[[bin]]
+name = "basic_pso"
+path = "src/bin/basic_pso.rs"
