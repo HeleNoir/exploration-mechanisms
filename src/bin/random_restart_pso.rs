@@ -17,7 +17,7 @@ use clap::Parser;
 use itertools::iproduct;
 use mahf::problems::LimitedVectorProblem;
 use rayon::prelude::*;
-use crate::algorithms::pso::basic_pso;
+use crate::algorithms::pso_random_restarts::random_restart_pso;
 
 static CONTEXT: Lazy<Context<C>> = Lazy::new(Context::default);
 
@@ -46,7 +46,7 @@ fn main() -> anyhow::Result<()> {
     let functions = args.function;
     let dimensions: usize = args.dimensions;
 
-    let folder = format!("data/basic_PSO/d{:?}_p{:?}", dimensions, pop_size);
+    let folder = format!("data/random_restart_PSO/d{:?}_p{:?}", dimensions, pop_size);
 
     // TODO: set number of runs per instance
     let runs = [1, 2, 3, 4, 5];
@@ -54,10 +54,12 @@ fn main() -> anyhow::Result<()> {
     let evaluations: u32 = (10000 * dimensions) as u32;
     let iterations = (evaluations - pop_size)/pop_size;
 
+    // TODO: define restart interval / maybe change condition
+    let restart_interval = iterations / 10;
     // TODO: set algorithm parameters
-    let weights = [0.1, 0.3, 0.5, 0.7, 1.0];
-    let c1s = [0.5, 1.0, 1.7];
-    let c2s = [0.5, 1.0, 1.7];
+    let weights = [0.5];
+    let c1s = [0.5];
+    let c2s = [0.5];
 
     let configs: Vec<_> = iproduct!(weights, c1s, c2s).collect();
 
@@ -104,21 +106,24 @@ fn main() -> anyhow::Result<()> {
                     let v_max = (upper - lower) / 2.0;
 
                     // This is the main setup of the algorithm
-                    let conf: Configuration<Instance> = basic_pso(
+                    let conf: Configuration<Instance> = random_restart_pso(
                         evaluations,
                         pop_size,
+                        restart_interval,
                         config.0, // Weight
                         config.1, // C1
                         config.2, // C2
                         v_max,
                     );
 
-                    let output = format!("{}{}{}{}{}{}{}{}{}{}{}",
+                    let output = format!("{}{}{}{}{}{}{}{}{}{}{}{}{}",
                                          run,
                                          "_",
                                          instance.name(),
                                          "_",
                                          pop_size,
+                                         "_",
+                                         restart_interval,
                                          "_",
                                          config.0,
                                          "_",
