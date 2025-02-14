@@ -48,26 +48,28 @@ fn main() -> anyhow::Result<()> {
 
     let folder = format!("data/random_restart_PSO/d{:?}_p{:?}", dimensions, pop_size);
 
-    // TODO: set number of runs per instance
-    let runs = [1, 2, 3, 4, 5];
-    // TODO: set number of evaluations and iterations
+    let runs = 25;
     let evaluations: u32 = (10000 * dimensions) as u32;
-    let iterations = (evaluations - pop_size)/pop_size;
 
     // TODO: define restart interval / maybe change condition
-    let restart_interval = iterations / 10;
+    let restart_interval_evaluations = [evaluations as f64 * 0.1, evaluations as f64 * 0.2];
+    let restart_interval_exploration = [0.05, 0.1, 0.2];
+    let restarts_evaluations = vec!["evaluations"];
+    let restarts_exploration = vec!["exploration"];
     // TODO: set algorithm parameters
     let weights = [0.5];
     let c1s = [0.5];
     let c2s = [0.5];
 
-    let configs: Vec<_> = iproduct!(weights, c1s, c2s).collect();
+    let mut configs_eval_restart: Vec<_> = iproduct!(weights, c1s, c2s, restarts_evaluations, restart_interval_evaluations).collect();
+    let configs = iproduct!(weights, c1s, c2s, restarts_exploration, restart_interval_exploration).collect();
+    configs.append(&mut configs_eval_restart);
 
     // TODO: set the benchmark problems
     let instance_indices = 1..6;
     let index: Vec<usize> = instance_indices.clone().collect();
 
-    let n = runs.len() as u64;
+    let n = runs as u64;
     let m = index.len() as u64;
 
     let seeds: Vec<Vec<u64>> = (0..n)
@@ -89,8 +91,8 @@ fn main() -> anyhow::Result<()> {
         evaluators.push(evaluator);
     }
 
-    runs.into_par_iter()
-        .zip(std::iter::repeat(evaluators).take(runs.len()).collect::<Vec<_>>())
+    (1..=runs).into_par_iter()
+        .zip(std::iter::repeat(evaluators).take(runs).collect::<Vec<_>>())
         .for_each(|(run, evaluator)| {
 
             for config in &configs {
@@ -105,31 +107,39 @@ fn main() -> anyhow::Result<()> {
                     let upper = bounds[0].end.clone();
                     let v_max = (upper - lower) / 2.0;
 
+                    let condition = if config.3 == "evaluations" {
+                        conditions::LessThanN::evaluations(config.4)
+                    } else {
+                        conditions::LessThanN::new(config.4, NormalizedDiversityLens::<MinimumIndividualDistance>)
+                    };
+
                     // This is the main setup of the algorithm
                     let conf: Configuration<Instance> = random_restart_pso(
                         evaluations,
                         pop_size,
-                        restart_interval,
                         config.0, // Weight
                         config.1, // C1
                         config.2, // C2
                         v_max,
+                        condition, // restart condition
                     );
 
-                    let output = format!("{}{}{}{}{}{}{}{}{}{}{}{}{}",
+                    let output = format!("{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}",
                                          run,
                                          "_",
                                          instance.name(),
                                          "_",
                                          pop_size,
                                          "_",
-                                         restart_interval,
-                                         "_",
                                          config.0,
                                          "_",
                                          config.1,
                                          "_",
                                          config.2,
+                                         "_",
+                                         config.3,
+                                         "_",
+                                         config.4,
                     );
 
                     let data_dir = Arc::new(PathBuf::from(&folder));
@@ -138,7 +148,6 @@ fn main() -> anyhow::Result<()> {
                     let experiment_desc = output;
                     let log_file = data_dir.join(format!("{}.cbor", experiment_desc));
 
-                    // TODO: adapt logging
                     // This executes the algorithm
                     let setup = conf.optimize_with(&instance, |state: &mut State<_>| -> ExecResult<()> {
                         state.insert_evaluator(evaluator);
@@ -151,10 +160,7 @@ fn main() -> anyhow::Result<()> {
                                         ValueOf::<common::Evaluations>::entry(),
                                         BestObjectiveValueLens::entry(),
                                         ObjectiveValuesLens::entry(),
-                                        NormalizedDiversityLens::<DimensionWiseDiversity>::entry(),
-                                        NormalizedDiversityLens::<PairwiseDistanceDiversity>::entry(),
                                         NormalizedDiversityLens::<MinimumIndividualDistance>::entry(),
-                                        NormalizedDiversityLens::<RadiusDiversity>::entry(),
                                     ],
                                 )
                             ;
