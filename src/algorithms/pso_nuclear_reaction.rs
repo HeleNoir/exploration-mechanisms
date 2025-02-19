@@ -3,15 +3,22 @@ use mahf::{prelude::*,
                         measures::{diversity::{MinimumIndividualDistance}, }},
            configuration::Configuration, logging::Logger,
            problems::{LimitedVectorProblem, SingleObjectiveProblem, KnownOptimumProblem}};
+use mahf::identifier::Global;
 
-
-pub fn basic_pso<P>(
+pub fn nuclear_reaction_pso<P>(
     evaluations: u32,
     population_size: u32,
     w: f64,
     c1: f64,
     c2: f64,
     v_max: f64,
+    condition: Box<dyn Condition<P>>,
+    new_pop: u32,
+    mu: f64,
+    rho: f64,
+    termination_type: String,
+    termination_value: usize,
+    replacement: Box<dyn Component<P>>,
 ) -> Configuration<P>
 where P: SingleObjectiveProblem + LimitedVectorProblem<Element = f64> + KnownOptimumProblem,
 {
@@ -26,14 +33,23 @@ where P: SingleObjectiveProblem + LimitedVectorProblem<Element = f64> + KnownOpt
             conditions::LessThanN::evaluations(evaluations),
             |builder| {
                 builder
-                    .do_(Box::from(swarm::pso::ParticleVelocitiesUpdate::new(
-                        w,
-                        c1,
-                        c2,
-                        v_max,
-                    )))
-                    .do_(boundary::Mirror::new())
-                    .evaluate()
+                    .if_else_(condition, |builder| {
+                        builder
+                            .do_(selection::All::new())
+                            .do_(swarm::nfnf::NuclearReactionMechanism::new(new_pop, mu, rho, termination_type, termination_value))
+                            .do_(boundary::Mirror::new())
+                            .do_(replacement)
+                    }, |builder| {
+                        builder
+                            .do_(Box::from(swarm::pso::ParticleVelocitiesUpdate::new(
+                                w,
+                                c1,
+                                c2,
+                                v_max,
+                            )))
+                            .do_(boundary::Mirror::new())
+                    })
+                    .evaluate_with::<Global>()
                     .update_best_individual()
                     .do_(MinimumIndividualDistance::new())
                     .do_(swarm::pso::ParticleSwarmUpdate::new())

@@ -22,3 +22,23 @@ mahf = { git = "https://github.com/mahf-opt/mahf", branch = "exploration-operato
 [[bin]]
 name = "basic_pso"
 path = "src/bin/basic_pso.rs"
+
+[[bin]]
+name = "random_restart_pso"
+path = "src/bin/random_restart_pso.rs"
+
+[[bin]]
+name = "cyclic_universe_pso"
+path = "src/bin/cyclic_universe_pso.rs"
+
+[[bin]]
+name = "nuclear_reaction_pso"
+path = "src/bin/nuclear_reaction_pso.rs"
+
+[[bin]]
+name = "mine_explosion_pso"
+path = "src/bin/mine_explosion_pso.rs"
+
+[[bin]]
+name = "stepped_leader_pso"
+path = "src/bin/stepped_leader_pso.rs"

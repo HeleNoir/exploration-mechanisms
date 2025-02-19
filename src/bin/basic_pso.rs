@@ -2,8 +2,8 @@
 mod algorithms;
 
 use mahf::{prelude::*, configuration::Configuration, Random,
-           lens::common::{BestObjectiveValueLens, ObjectiveValuesLens},
-           components::measures::{diversity::{NormalizedDiversityLens, DimensionWiseDiversity, PairwiseDistanceDiversity, MinimumIndividualDistance, RadiusDiversity}, },
+           lens::common::{BestObjectiveValueLens},
+           components::measures::{diversity::{NormalizedDiversityLens, MinimumIndividualDistance}, },
 };
 use mahf_coco::{Instance, AcceleratedEvaluator, Suite, Context, Options, backends::C, Name::Bbob};
 
@@ -35,7 +35,18 @@ struct Args {
     /// Population size of algorithm
     #[arg(long, default_value_t = 10)]
     population_size: u32,
+    
+    /// Inertia weight of PSO
+    #[arg(long, default_value_t = 0.9)]
+    inertia_weight: f64,
 
+    /// C1 of PSO
+    #[arg(long, default_value_t = 0.5)]
+    c1: f64,
+
+    /// C2 of PSO
+    #[arg(long, default_value_t = 0.5)]
+    c2: f64,
 }
 
 
@@ -45,23 +56,19 @@ fn main() -> anyhow::Result<()> {
     let pop_size = args.population_size;
     let functions = args.function;
     let dimensions: usize = args.dimensions;
+    let inertia_weight: f64 = args.inertia_weight;
+    let c1: f64 = args.c1;
+    let c2: f64 = args.c2;
 
     let folder = format!("data/basic_PSO/d{:?}_p{:?}", dimensions, pop_size);
 
-    // TODO: set number of runs per instance
-    let runs = [1, 2, 3, 4, 5];
-    // TODO: set number of evaluations and iterations
+    // set number of runs per instance
+    let runs: [usize; 25] = (1..=25).collect::<Vec<_>>()
+        .try_into().expect("wrong size iterator");    
+    // set number of evaluations
     let evaluations: u32 = (10000 * dimensions) as u32;
-    let iterations = (evaluations - pop_size)/pop_size;
-
-    // TODO: set algorithm parameters
-    let weights = [0.1, 0.3, 0.5, 0.7, 1.0];
-    let c1s = [0.5, 1.0, 1.7];
-    let c2s = [0.5, 1.0, 1.7];
-
-    let configs: Vec<_> = iproduct!(weights, c1s, c2s).collect();
-
-    // TODO: set the benchmark problems
+    
+    // set the benchmark problems
     let instance_indices = 1..6;
     let index: Vec<usize> = instance_indices.clone().collect();
 
@@ -91,73 +98,65 @@ fn main() -> anyhow::Result<()> {
         .zip(std::iter::repeat(evaluators).take(runs.len()).collect::<Vec<_>>())
         .for_each(|(run, evaluator)| {
 
-            for config in &configs {
+            for (i, (instance, eval)) in problems.iter().zip(evaluator.iter()).enumerate() {
+                let evaluator = eval.clone();
 
-                for (i, (instance, eval)) in problems.iter().zip(evaluator.iter()).enumerate() {
-                    let evaluator = eval.clone();
+                let seed = seeds[run-1][i];
 
-                    let seed = seeds[run-1][i];
+                let bounds = instance.domain();
+                let lower = bounds[0].start.clone();
+                let upper = bounds[0].end.clone();
+                let v_max = (upper - lower) / 2.0;
 
-                    let bounds = instance.domain();
-                    let lower = bounds[0].start.clone();
-                    let upper = bounds[0].end.clone();
-                    let v_max = (upper - lower) / 2.0;
+                // This is the main setup of the algorithm
+                let conf: Configuration<Instance> = basic_pso(
+                    evaluations,
+                    pop_size,
+                    inertia_weight, // Weight
+                    c1, // C1
+                    c2, // C2
+                    v_max,
+                );
 
-                    // This is the main setup of the algorithm
-                    let conf: Configuration<Instance> = basic_pso(
-                        evaluations,
-                        pop_size,
-                        config.0, // Weight
-                        config.1, // C1
-                        config.2, // C2
-                        v_max,
-                    );
+                let output = format!("{}{}{}{}{}{}{}{}{}{}{}",
+                                     run,
+                                     "_",
+                                     instance.name(),
+                                     "_",
+                                     pop_size,
+                                     "_",
+                                     inertia_weight,
+                                     "_",
+                                     c1,
+                                     "_",
+                                     c2,
+                );
 
-                    let output = format!("{}{}{}{}{}{}{}{}{}{}{}",
-                                         run,
-                                         "_",
-                                         instance.name(),
-                                         "_",
-                                         pop_size,
-                                         "_",
-                                         config.0,
-                                         "_",
-                                         config.1,
-                                         "_",
-                                         config.2,
-                    );
+                let data_dir = Arc::new(PathBuf::from(&folder));
+                fs::create_dir_all(data_dir.as_ref()).expect("TODO: panic message");
 
-                    let data_dir = Arc::new(PathBuf::from(&folder));
-                    fs::create_dir_all(data_dir.as_ref()).expect("TODO: panic message");
+                let experiment_desc = output;
+                let log_file = data_dir.join(format!("{}.cbor", experiment_desc));
 
-                    let experiment_desc = output;
-                    let log_file = data_dir.join(format!("{}.cbor", experiment_desc));
-
-                    // TODO: adapt logging
-                    // This executes the algorithm
-                    let setup = conf.optimize_with(&instance, |state: &mut State<_>| -> ExecResult<()> {
-                        state.insert_evaluator(evaluator);
-                        state.insert(Random::new(seed));
-                        state.configure_log(|con| {
-                            con
-                                .with_many(
-                                    conditions::EveryN::iterations(1),
-                                    [
-                                        ValueOf::<common::Evaluations>::entry(),
-                                        BestObjectiveValueLens::entry(),
-                                        ObjectiveValuesLens::entry(),
-                                        NormalizedDiversityLens::<DimensionWiseDiversity>::entry(),
-                                        NormalizedDiversityLens::<PairwiseDistanceDiversity>::entry(),
-                                        NormalizedDiversityLens::<MinimumIndividualDistance>::entry(),
-                                        NormalizedDiversityLens::<RadiusDiversity>::entry(),
-                                    ],
-                                )
-                            ;
-                            Ok(())
-                        })
-                    });
-                    setup.unwrap().log().to_cbor(log_file).expect("TODO: panic message");
-                }
+                // This executes the algorithm
+                let setup = conf.optimize_with(&instance, |state: &mut State<_>| -> ExecResult<()> {
+                    state.insert_evaluator(evaluator);
+                    state.insert(Random::new(seed));
+                    state.configure_log(|con| {
+                        con
+                            .with_many(
+                                conditions::EveryN::iterations(1),
+                                [
+                                    ValueOf::<common::Evaluations>::entry(),
+                                    BestObjectiveValueLens::entry(),
+                                    NormalizedDiversityLens::<MinimumIndividualDistance>::entry(),
+                                ],
+                            )
+                        ;
+                        Ok(())
+                    })
+                });
+                setup.unwrap().log().to_cbor(log_file).expect("TODO: panic message");
             }
 
         });
