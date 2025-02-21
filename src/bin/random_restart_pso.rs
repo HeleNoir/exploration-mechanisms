@@ -15,6 +15,7 @@ use std::{
 use once_cell::sync::Lazy;
 use clap::Parser;
 use itertools::iproduct;
+use mahf::conditions::common::PartialEqChecker;
 use mahf::problems::LimitedVectorProblem;
 use mahf::state::common::Evaluations;
 use rayon::prelude::*;
@@ -122,8 +123,7 @@ fn main() -> anyhow::Result<()> {
                     let v_max = (upper - lower) / 2.0;
 
                     let condition = if config.0 == "evaluations" {
-                        //TODO: change after implementing proper condition
-                        conditions::EveryN::new(config.1 as u32, ValueOf::<Evaluations>::new())
+                        conditions::StagnationForN::new(config.1 as usize, ValueOf::<Evaluations>::new(), BestObjectiveValueLens::new(), PartialEqChecker::new())
                     } else {
                         conditions::LessThanN::new(config.1, NormalizedDiversityLens::<MinimumIndividualDistance>::new())
                     };
