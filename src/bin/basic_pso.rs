@@ -29,11 +29,11 @@ struct Args {
     function: usize,
 
     /// Dimensions of BBOB function
-    #[arg(long, default_value_t = 2)]
+    #[arg(long, default_value_t = 10)]
     dimensions: usize,
 
     /// Population size of algorithm
-    #[arg(long, default_value_t = 10)]
+    #[arg(long, default_value_t = 50)]
     population_size: u32,
     
     /// Inertia weight of PSO

@@ -2,7 +2,7 @@ use mahf::{prelude::*,
            components::{initialization,
                         measures::{diversity::{MinimumIndividualDistance}, }},
            configuration::Configuration, logging::Logger,
-           problems::{LimitedVectorProblem, SingleObjectiveProblem, KnownOptimumProblem}};
+           problems::{LimitedVectorProblem, SingleObjectiveProblem}};
 
 
 pub fn basic_pso<P>(
@@ -13,7 +13,7 @@ pub fn basic_pso<P>(
     c2: f64,
     v_max: f64,
 ) -> Configuration<P>
-where P: SingleObjectiveProblem + LimitedVectorProblem<Element = f64> + KnownOptimumProblem,
+where P: SingleObjectiveProblem + LimitedVectorProblem<Element = f64>,
 {
     Configuration::builder()
         .do_(initialization::RandomSpread::new(population_size))
