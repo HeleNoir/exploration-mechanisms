@@ -1,0 +1,60 @@
+## This is an example of specifying a list of instances.
+
+# Each line is an instance relative to trainInstancesDir/testInstancesdir
+# unless set to "" (see scenario.txt.tmpl) and an optional sequence of
+# instance-specific parameters that will be passed to target-runner when
+# invoked on that instance.
+
+# Empty lines and comments are ignored.
+
+"" --function 1 --instance 6
+"" --function 2 --instance 6
+"" --function 3 --instance 6
+"" --function 4 --instance 6
+"" --function 5 --instance 6
+"" --function 6 --instance 6
+"" --function 7 --instance 6
+"" --function 8 --instance 6
+"" --function 9 --instance 6
+"" --function 10 --instance 6
+"" --function 11 --instance 6
+"" --function 12 --instance 6
+"" --function 13 --instance 6
+"" --function 14 --instance 6
+"" --function 15 --instance 6
+"" --function 16 --instance 6
+"" --function 17 --instance 6
+"" --function 18 --instance 6
+"" --function 19 --instance 6
+"" --function 20 --instance 6
+"" --function 21 --instance 6
+"" --function 22 --instance 6
+"" --function 23 --instance 6
+"" --function 24 --instance 6
+
+"" --function 1 --instance 7
+"" --function 2 --instance 7
+"" --function 3 --instance 7
+"" --function 4 --instance 7
+"" --function 5 --instance 7
+"" --function 6 --instance 7
+"" --function 7 --instance 7
+"" --function 8 --instance 7
+"" --function 9 --instance 7
+"" --function 10 --instance 7
+"" --function 11 --instance 7
+"" --function 12 --instance 7
+"" --function 13 --instance 7
+"" --function 14 --instance 7
+"" --function 15 --instance 7
+"" --function 16 --instance 7
+"" --function 17 --instance 7
+"" --function 18 --instance 7
+"" --function 19 --instance 7
+"" --function 20 --instance 7
+"" --function 21 --instance 7
+"" --function 22 --instance 7
+"" --function 23 --instance 7
+"" --function 24 --instance 7
+
+#TODO check functions and instances
