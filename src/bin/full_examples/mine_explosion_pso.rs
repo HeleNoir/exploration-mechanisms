@@ -1,4 +1,4 @@
-#[path = "../algorithms/mod.rs"]
+#[path = "../../algorithms/mod.rs"]
 mod algorithms;
 
 use mahf::{prelude::*, configuration::Configuration, Random,
@@ -12,16 +12,16 @@ use std::{
     path::PathBuf,
     sync::{Arc},
 };
-use std::convert::TryInto;
 use once_cell::sync::Lazy;
 use clap::Parser;
 use itertools::iproduct;
+use mahf::conditions::common::PartialEqChecker;
+use mahf::prelude::common::Evaluations;
 use mahf::problems::LimitedVectorProblem;
 use rayon::prelude::*;
-use crate::algorithms::shade::shade;
+use crate::algorithms::pso_mine_explosion::mine_explosion_pso;
 
 static CONTEXT: Lazy<Context<C>> = Lazy::new(Context::default);
-
 
 #[derive(Parser)]
 #[clap(version, about)]
@@ -37,6 +37,22 @@ struct Args {
     /// Population size of algorithm
     #[arg(long, default_value_t = 10)]
     population_size: u32,
+
+    /// Inertia weight of PSO
+    #[arg(long, default_value_t = 0.9)]
+    inertia_weight: f64,
+
+    /// C1 of PSO
+    #[arg(long, default_value_t = 0.5)]
+    c1: f64,
+
+    /// C2 of PSO
+    #[arg(long, default_value_t = 0.5)]
+    c2: f64,
+
+    /// Population size of exploration mechanism
+    #[arg(long, default_value_t = 5)]
+    new_pop: u32,
 }
 
 
@@ -46,24 +62,32 @@ fn main() -> anyhow::Result<()> {
     let pop_size = args.population_size;
     let functions = args.function;
     let dimensions: usize = args.dimensions;
-    
-    let folder = format!("data/basic_shade/d{:?}_p{:?}", dimensions, pop_size);
+    let inertia_weight: f64 = args.inertia_weight;
+    let c1: f64 = args.c1;
+    let c2: f64 = args.c2;
+    let new_pop: u32 = args.new_pop;
+
+    let folder = format!("data/mine_explosion_PSO/d{:?}_p{:?}", dimensions, pop_size);
 
     // set number of runs per instance
-    let runs: [usize; 25] = (1..=25).collect::<Vec<_>>()
+    // TODO set correctly after testing
+    let runs: [usize; 5] = (1..=5).collect::<Vec<_>>()
         .try_into().expect("wrong size iterator");
     // set number of evaluations
     let evaluations: u32 = (10000 * dimensions) as u32;
-    
-    // define remaining algorithmic parameters
-    let y = 2;
-    let history = 100;
-    let max_archive = pop_size as usize;
-    let crossovers = ["exp", "bin"];
-    let p_min = 2.0 / pop_size as f64;
-    let f = 0.5;
-    let cr = 0.5;
-    
+
+    // define exploration intervals and remaining algorithmic parameters
+    let restart_interval_evaluations = [evaluations as f64 * 0.1, evaluations as f64 * 0.2];
+    let restart_interval_exploration = [0.05, 0.1, 0.2];
+    let restarts_evaluations = vec!["evaluations"];
+    let restarts_exploration = vec!["exploration"];
+    let replacements = ["best", "worst", "random"];
+    let center_options = ["random_new", "best", "random_solution"];
+
+    let mut configs_eval_restart: Vec<_> = iproduct!(restarts_evaluations, restart_interval_evaluations, replacements, center_options).collect();
+    let mut configs: Vec<_> = iproduct!(restarts_exploration, restart_interval_exploration, replacements, center_options).collect();
+    configs.append(&mut configs_eval_restart);
+
     // set the benchmark problems
     let instance_indices = 1..6;
     let index: Vec<usize> = instance_indices.clone().collect();
@@ -93,49 +117,69 @@ fn main() -> anyhow::Result<()> {
     runs.into_par_iter()
         .zip(std::iter::repeat(evaluators).take(runs.len()).collect::<Vec<_>>())
         .for_each(|(run, evaluator)| {
-            
-            for c in crossovers.iter() {
+
+            for config in &configs {
+
                 for (i, (instance, eval)) in problems.iter().zip(evaluator.iter()).enumerate() {
                     let evaluator = eval.clone();
 
-                    let seed = seeds[run - 1][i];
+                    let seed = seeds[run-1][i];
 
-                    let crossover = if *c == "exp" {
-                        recombination::de::DEExponentialCrossover::new(cr).unwrap()
+                    let bounds = instance.domain();
+                    let lower = bounds[0].start.clone();
+                    let upper = bounds[0].end.clone();
+                    let v_max = (upper - lower) / 2.0;
+
+                    let condition = if config.0 == "evaluations" {
+                        conditions::StagnationForN::new(config.1 as usize, ValueOf::<Evaluations>::new(), BestObjectiveValueLens::new(), PartialEqChecker::new())
                     } else {
-                        recombination::de::DEBinomialCrossover::new(cr).unwrap()
+                        conditions::LessThanN::new(config.1, NormalizedDiversityLens::<MinimumIndividualDistance>::new())
+                    };
+
+                    let replacement = if config.2 == "best" {
+                        replacement::pso::ReplaceNBestPSO::new(new_pop, v_max)
+                    } else if config.2 == "worst" {
+                        replacement::pso::ReplaceNWorstPSO::new(new_pop, v_max)
+                    } else {
+                        replacement::pso::ReplaceNRandomPSO::new(new_pop, v_max)
                     };
 
                     // This is the main setup of the algorithm
-                    let conf: Configuration<Instance> = shade(
+                    let conf: Configuration<Instance> = mine_explosion_pso(
                         evaluations,
                         pop_size,
-                        y, // number of individuals to select for mutation
-                        p_min, // minimum for parameter selecting the pbest
-                        max_archive, // maximum size of archive
-                        history, // maximum length of history for F and CR adaptation
-                        f, // initial value of F; of no consequence when using SHADEAdaptation
-                        crossover, // exp or bin
+                        inertia_weight, // Weight
+                        c1, // C1
+                        c2, // C2
+                        v_max,
+                        condition, // exploration mechanism condition
+                        new_pop, // number of new solutions the exploration mechanism generates
+                        config.3.parse().unwrap(), // center solution that provides basis for generating new solutions
+                        replacement, // replacement operator applied after exploration mechanism
                     );
 
-                    let output = format!("{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}",
+                    let output = format!("{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}",
                                          run,
                                          "_",
                                          instance.name(),
                                          "_",
                                          pop_size,
                                          "_",
-                                         y,
+                                         inertia_weight,
                                          "_",
-                                         p_min,
+                                         c1,
                                          "_",
-                                         max_archive,
+                                         c2,
                                          "_",
-                                         history,
+                                         config.0,
                                          "_",
-                                         f,
+                                         config.1,
                                          "_",
-                                         c
+                                         new_pop,
+                                         "_",
+                                         config.3,
+                                         "_",
+                                         config.2,
                     );
 
                     let data_dir = Arc::new(PathBuf::from(&folder));
@@ -165,6 +209,7 @@ fn main() -> anyhow::Result<()> {
                     setup.unwrap().log().to_cbor(log_file).expect("TODO: panic message");
                 }
             }
+
         });
     Ok(())
 }

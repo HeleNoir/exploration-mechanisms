@@ -1,4 +1,4 @@
-#[path = "../algorithms/mod.rs"]
+#[path = "../../algorithms/mod.rs"]
 mod algorithms;
 
 use mahf::{prelude::*, configuration::Configuration, Random,
@@ -29,7 +29,7 @@ struct Args {
     function: usize,
 
     /// Dimensions of BBOB function
-    #[arg(long, default_value_t = 10)]
+    #[arg(long, default_value_t = 40)]
     dimensions: usize,
 
     /// Population size of algorithm

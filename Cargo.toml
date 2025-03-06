@@ -21,24 +21,54 @@ mahf = { git = "https://github.com/mahf-opt/mahf", branch = "exploration-operato
 
 [[bin]]
 name = "basic_pso"
-path = "src/bin/basic_pso.rs"
+path = "src/bin/full_examples/basic_pso.rs"
 
 [[bin]]
 name = "random_restart_pso"
-path = "src/bin/random_restart_pso.rs"
+path = "src/bin/full_examples/random_restart_pso.rs"
 
 [[bin]]
 name = "cyclic_universe_pso"
-path = "src/bin/cyclic_universe_pso.rs"
+path = "src/bin/full_examples/cyclic_universe_pso.rs"
 
 [[bin]]
 name = "nuclear_reaction_pso"
-path = "src/bin/nuclear_reaction_pso.rs"
+path = "src/bin/full_examples/nuclear_reaction_pso.rs"
 
 [[bin]]
 name = "mine_explosion_pso"
-path = "src/bin/mine_explosion_pso.rs"
+path = "src/bin/full_examples/mine_explosion_pso.rs"
 
 [[bin]]
 name = "stepped_leader_pso"
-path = "src/bin/stepped_leader_pso.rs"
+path = "src/bin/full_examples/stepped_leader_pso.rs"
+
+[[bin]]
+name = "irace_pso"
+path = "src/bin/irace_tuning/irace_pso.rs"
+
+[[bin]]
+name = "irace_shade"
+path = "src/bin/irace_tuning/irace_shade.rs"
+
+[[bin]]
+name = "irace_random_restart_pso"
+path = "src/bin/irace_tuning/irace_random_restart_pso.rs"
+
+[[bin]]
+name = "irace_cyclic_universe_pso"
+path = "src/bin/irace_tuning/irace_cyclic_universe_pso.rs"
+
+[[bin]]
+name = "irace_mine_explosion_pso"
+path = "src/bin/irace_tuning/irace_mine_explosion_pso.rs"
+
+[[bin]]
+name = "irace_nuclear_reaction_pso"
+path = "src/bin/irace_tuning/irace_nuclear_reaction_pso.rs"
+
+[[bin]]
+name = "irace_stepped_leader_pso"
+path = "src/bin/irace_tuning/irace_stepped_leader_pso.rs"
+
+

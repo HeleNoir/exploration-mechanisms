@@ -1,4 +1,4 @@
-#[path = "../algorithms/mod.rs"]
+#[path = "../../algorithms/mod.rs"]
 mod algorithms;
 
 use mahf::{prelude::*, configuration::Configuration, Random,

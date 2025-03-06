@@ -15,7 +15,6 @@ pub fn nuclear_reaction_pso<P>(
     condition: Box<dyn Condition<P>>,
     new_pop: u32,
     mu: f64,
-    rho: f64,
     termination_type: String,
     termination_value: usize,
     replacement: Box<dyn Component<P>>,
@@ -36,8 +35,8 @@ where P: SingleObjectiveProblem + LimitedVectorProblem<Element = f64> + KnownOpt
                     .if_else_(condition, |builder| {
                         builder
                             .do_(selection::All::new())
-                            .do_(swarm::nfnf::NuclearReactionMechanism::new(new_pop, mu, rho, termination_type, termination_value))
-                            .do_(boundary::Mirror::new())
+                            .do_(swarm::nfnf::NuclearReactionMechanism::new(new_pop, mu, termination_type, termination_value))
+                            .do_(boundary::CompleteOneTailedNormalCorrection::new())
                             .do_(replacement)
                     }, |builder| {
                         builder
@@ -47,7 +46,7 @@ where P: SingleObjectiveProblem + LimitedVectorProblem<Element = f64> + KnownOpt
                                 c2,
                                 v_max,
                             )))
-                            .do_(boundary::Mirror::new())
+                            .do_(boundary::CompleteOneTailedNormalCorrection::new())
                     })
                     .evaluate_with::<Global>()
                     .update_best_individual()

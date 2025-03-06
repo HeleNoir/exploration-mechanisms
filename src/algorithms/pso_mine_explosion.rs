@@ -34,7 +34,7 @@ where P: SingleObjectiveProblem + LimitedVectorProblem<Element = f64> + KnownOpt
                         builder
                             .do_(selection::All::new())
                             .do_(swarm::mba::MineExplosionDynamics::new(new_pop, center))
-                            .do_(boundary::Mirror::new())
+                            .do_(boundary::CompleteOneTailedNormalCorrection::new())
                             .do_(replacement)
                     }, |builder| {
                         builder

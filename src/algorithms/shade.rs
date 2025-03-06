@@ -32,7 +32,7 @@ where P: SingleObjectiveProblem + LimitedVectorProblem<Element = f64>,
                     .do_(selection::de::SHADECurrentToPBest::new(y, p_min, population_size as usize, max_archive).wrap_err("failed to construct DE selection").unwrap())
                     .do_(mutation::de::DEMutation::new(y, f).wrap_err("failed to construct DE mutation").unwrap())
                     .do_(crossover)
-                    .do_(boundary::Mirror::new())
+                    .do_(boundary::CompleteOneTailedNormalCorrection::new())
                     .evaluate()
                     .update_best_individual()
                     .do_(components::archive::DEKeepParentsArchiveUpdate::new(max_archive))

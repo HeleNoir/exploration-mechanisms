@@ -1,4 +1,4 @@
-#[path = "../algorithms/mod.rs"]
+#[path = "../../algorithms/mod.rs"]
 mod algorithms;
 
 use mahf::{prelude::*, configuration::Configuration, Random,
@@ -19,7 +19,7 @@ use mahf::conditions::common::PartialEqChecker;
 use mahf::prelude::common::Evaluations;
 use mahf::problems::LimitedVectorProblem;
 use rayon::prelude::*;
-use crate::algorithms::pso_cyclic_universe::cyclic_universe_pso;
+use crate::algorithms::pso_nuclear_reaction::nuclear_reaction_pso;
 
 static CONTEXT: Lazy<Context<C>> = Lazy::new(Context::default);
 
@@ -53,6 +53,11 @@ struct Args {
     /// Population size of exploration mechanism
     #[arg(long, default_value_t = 5)]
     new_pop: u32,
+
+    /// Magnification factor of nuclear reaction mechanism; original between 10^0 and 10^20;
+    /// smaller values (probably) lead to more exploration
+    #[arg(long, default_value_t = 100.0)]
+    mu: f64,
 }
 
 
@@ -66,8 +71,9 @@ fn main() -> anyhow::Result<()> {
     let c1: f64 = args.c1;
     let c2: f64 = args.c2;
     let new_pop: u32 = args.new_pop;
+    let mu: f64 = args.mu;
 
-    let folder = format!("data/cyclic_universe_PSO/d{:?}_p{:?}", dimensions, pop_size);
+    let folder = format!("data/nuclear_reaction_PSO/d{:?}_p{:?}", dimensions, pop_size);
 
     // set number of runs per instance
     // TODO set correctly after testing
@@ -82,6 +88,8 @@ fn main() -> anyhow::Result<()> {
     let restarts_evaluations = vec!["evaluations"];
     let restarts_exploration = vec!["exploration"];
     let replacements = ["best", "worst", "random"];
+    let termination_type: &str = "evaluations";
+    let termination_value: usize = evaluations as usize;
 
     let mut configs_eval_restart: Vec<_> = iproduct!(restarts_evaluations, restart_interval_evaluations, replacements).collect();
     let mut configs: Vec<_> = iproduct!(restarts_exploration, restart_interval_exploration, replacements).collect();
@@ -134,7 +142,7 @@ fn main() -> anyhow::Result<()> {
                     } else {
                         conditions::LessThanN::new(config.1, NormalizedDiversityLens::<MinimumIndividualDistance>::new())
                     };
-                    
+
                     let replacement = if config.2 == "best" {
                         replacement::pso::ReplaceNBestPSO::new(new_pop, v_max)
                     } else if config.2 == "worst" {
@@ -144,7 +152,7 @@ fn main() -> anyhow::Result<()> {
                     };
 
                     // This is the main setup of the algorithm
-                    let conf: Configuration<Instance> = cyclic_universe_pso(
+                    let conf: Configuration<Instance> = nuclear_reaction_pso(
                         evaluations,
                         pop_size,
                         inertia_weight, // Weight
@@ -153,10 +161,13 @@ fn main() -> anyhow::Result<()> {
                         v_max,
                         condition, // exploration mechanism condition
                         new_pop, // number of new solutions the exploration mechanism generates
+                        mu, // magnification factor
+                        termination_type.parse().unwrap(), // termination criterion, either iterations or evaluations
+                        termination_value, // termination criterion value
                         replacement, // replacement operator applied after exploration mechanism
                     );
 
-                    let output = format!("{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}",
+                    let output = format!("{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}",
                                          run,
                                          "_",
                                          instance.name(),
@@ -174,6 +185,8 @@ fn main() -> anyhow::Result<()> {
                                          config.1,
                                          "_",
                                          new_pop,
+                                         "_",
+                                         mu,
                                          "_",
                                          config.2,
                     );

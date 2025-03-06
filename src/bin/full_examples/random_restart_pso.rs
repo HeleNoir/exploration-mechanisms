@@ -1,4 +1,4 @@
-#[path = "../algorithms/mod.rs"]
+#[path = "../../algorithms/mod.rs"]
 mod algorithms;
 
 use mahf::{prelude::*, configuration::Configuration, Random,
@@ -16,10 +16,10 @@ use once_cell::sync::Lazy;
 use clap::Parser;
 use itertools::iproduct;
 use mahf::conditions::common::PartialEqChecker;
-use mahf::prelude::common::Evaluations;
 use mahf::problems::LimitedVectorProblem;
+use mahf::state::common::Evaluations;
 use rayon::prelude::*;
-use crate::algorithms::pso_nuclear_reaction::nuclear_reaction_pso;
+use crate::algorithms::pso_random_restarts::random_restart_pso;
 
 static CONTEXT: Lazy<Context<C>> = Lazy::new(Context::default);
 
@@ -49,19 +49,6 @@ struct Args {
     /// C2 of PSO
     #[arg(long, default_value_t = 0.5)]
     c2: f64,
-
-    /// Population size of exploration mechanism
-    #[arg(long, default_value_t = 5)]
-    new_pop: u32,
-
-    /// Magnification factor of nuclear reaction mechanism; original between 10^0 and 10^20;
-    /// smaller values (probably) lead to more exploration
-    #[arg(long, default_value_t = 100.0)]
-    mu: f64,
-
-    /// Amplification factor of nuclear reaction mechanism; original between 1.0 and 3.0
-    #[arg(long, default_value_t = 1.01)]
-    rho: f64,
 }
 
 
@@ -74,30 +61,23 @@ fn main() -> anyhow::Result<()> {
     let inertia_weight: f64 = args.inertia_weight;
     let c1: f64 = args.c1;
     let c2: f64 = args.c2;
-    let new_pop: u32 = args.new_pop;
-    let mu: f64 = args.mu;
-    let rho: f64 = args.rho;
 
-    let folder = format!("data/nuclear_reaction_PSO/d{:?}_p{:?}", dimensions, pop_size);
+    let folder = format!("data/random_restart_PSO/d{:?}_p{:?}", dimensions, pop_size);
 
     // set number of runs per instance
-    // TODO set correctly after testing
-    let runs: [usize; 5] = (1..=5).collect::<Vec<_>>()
+    let runs: [usize; 25] = (1..=25).collect::<Vec<_>>()
         .try_into().expect("wrong size iterator");
     // set number of evaluations
     let evaluations: u32 = (10000 * dimensions) as u32;
 
-    // define exploration intervals and remaining algorithmic parameters
+    // define restart interval / maybe change condition
     let restart_interval_evaluations = [evaluations as f64 * 0.1, evaluations as f64 * 0.2];
     let restart_interval_exploration = [0.05, 0.1, 0.2];
     let restarts_evaluations = vec!["evaluations"];
     let restarts_exploration = vec!["exploration"];
-    let replacements = ["best", "worst", "random"];
-    let termination_type: &str = "evaluations";
-    let termination_value: usize = evaluations as usize;
 
-    let mut configs_eval_restart: Vec<_> = iproduct!(restarts_evaluations, restart_interval_evaluations, replacements).collect();
-    let mut configs: Vec<_> = iproduct!(restarts_exploration, restart_interval_exploration, replacements).collect();
+    let mut configs_eval_restart: Vec<_> = iproduct!(restarts_evaluations, restart_interval_evaluations).collect();
+    let mut configs: Vec<_> = iproduct!(restarts_exploration, restart_interval_exploration).collect();
     configs.append(&mut configs_eval_restart);
 
     // set the benchmark problems
@@ -148,32 +128,18 @@ fn main() -> anyhow::Result<()> {
                         conditions::LessThanN::new(config.1, NormalizedDiversityLens::<MinimumIndividualDistance>::new())
                     };
 
-                    let replacement = if config.2 == "best" {
-                        replacement::pso::ReplaceNBestPSO::new(new_pop, v_max)
-                    } else if config.2 == "worst" {
-                        replacement::pso::ReplaceNWorstPSO::new(new_pop, v_max)
-                    } else {
-                        replacement::pso::ReplaceNRandomPSO::new(new_pop, v_max)
-                    };
-
                     // This is the main setup of the algorithm
-                    let conf: Configuration<Instance> = nuclear_reaction_pso(
+                    let conf: Configuration<Instance> = random_restart_pso(
                         evaluations,
                         pop_size,
                         inertia_weight, // Weight
                         c1, // C1
                         c2, // C2
                         v_max,
-                        condition, // exploration mechanism condition
-                        new_pop, // number of new solutions the exploration mechanism generates
-                        mu, // magnification factor
-                        rho, // amplification factor
-                        termination_type.parse().unwrap(), // termination criterion, either iterations or evaluations
-                        termination_value, // termination criterion value
-                        replacement, // replacement operator applied after exploration mechanism
+                        condition, // restart condition
                     );
 
-                    let output = format!("{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}",
+                    let output = format!("{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}",
                                          run,
                                          "_",
                                          instance.name(),
@@ -189,14 +155,6 @@ fn main() -> anyhow::Result<()> {
                                          config.0,
                                          "_",
                                          config.1,
-                                         "_",
-                                         new_pop,
-                                         "_",
-                                         mu,
-                                         "_",
-                                         rho,
-                                         "_",
-                                         config.2,
                     );
 
                     let data_dir = Arc::new(PathBuf::from(&folder));

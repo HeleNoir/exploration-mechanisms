@@ -33,7 +33,7 @@ where P: SingleObjectiveProblem + LimitedVectorProblem<Element = f64> + KnownOpt
                         builder
                             .do_(selection::All::new())
                             .do_(swarm::bbbc::CyclicUniverseMechanism::new(new_pop))
-                            .do_(boundary::Mirror::new())
+                            .do_(boundary::CompleteOneTailedNormalCorrection::new())
                             .do_(replacement)
                     }, |builder| {
                         builder
@@ -43,7 +43,7 @@ where P: SingleObjectiveProblem + LimitedVectorProblem<Element = f64> + KnownOpt
                                 c2,
                                 v_max,
                             )))
-                            .do_(boundary::Mirror::new())
+                            .do_(boundary::CompleteOneTailedNormalCorrection::new())
                     })
                     .evaluate_with::<Global>()
                     .update_best_individual()
