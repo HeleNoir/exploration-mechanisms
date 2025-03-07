@@ -46,15 +46,15 @@ struct Args {
     #[arg(long, default_value_t = 50)]
     population_size: u32,
     
-    /// Number of differences, 1 or 2
+    /// Number of difference vectors; 1 or 2
     #[arg(long, default_value_t = 1)]
     y: u32,
     
-    /// Crossover operator, bin or exp
+    /// Crossover operator; bin or exp
     #[arg(long, default_value = "bin")]
     crossover: String,
     
-    /// History size, 1 to maximum number of iterations; tuning in [1, 1000]
+    /// History size, 1 to maximum number of iterations; tuning in 1 to 1000
     #[arg(long, default_value_t = 100)]
     history: usize,
 }

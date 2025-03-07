@@ -30,7 +30,7 @@ exploration     "--exploration "     c      ("evaluations", "diversity")
 exp_param       "--exp-param "       c      (0.05, 0.1, 0.2)
 new_pop         "--new-pop "         i      (1, 50)
 replacement     "--replacement "     c      ("best", "worst", "random")
-mu              "--mu "              i      (1, 10000000000)
+mu              "--mu "              i      (1, 1000000000)
 
 [global]
 digits = 4 # Maximum number of decimal places that are significant for numerical (real) parameters.

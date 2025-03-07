@@ -33,7 +33,7 @@ struct Args {
     inst: String,
 
     /// Number of BBOB function
-    #[arg(long, default_value_t = 1)]
+    #[arg(long, default_value_t = 18)]
     function: usize,
 
     /// Instance of BBOB function
@@ -65,19 +65,19 @@ struct Args {
     exploration: String,
 
     /// Exploration parameter
-    #[arg(long, default_value_t = 0.05)]
+    #[arg(long, default_value_t = 0.2)]
     exp_param: f64,
     
     /// Population size of exploration mechanism, number of individuals that will be replaced; 1 to pop_size
-    #[arg(long, default_value_t = 5)]
+    #[arg(long, default_value_t = 29)]
     new_pop: u32,
 
     /// Solutions to be replaced; best, worst or random
-    #[arg(long, default_value = "best")]
+    #[arg(long, default_value = "worst")]
     replacement: String,
 
     /// Solution to be used as leader; best, random_new or random_solution
-    #[arg(long, default_value = "best")]
+    #[arg(long, default_value = "random_solution")]
     leader: String,
 }
 

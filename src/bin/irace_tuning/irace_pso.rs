@@ -45,15 +45,15 @@ struct Args {
     #[arg(long, default_value_t = 50)]
     population_size: u32,
 
-    /// Inertia weight of PSO
+    /// Inertia weight of PSO; 0.0 to 1.0
     #[arg(long, default_value_t = 0.9)]
     inertia_weight: f64,
 
-    /// C1 of PSO
+    /// C1 of PSO; 0.0 to 2.5
     #[arg(long, default_value_t = 0.5)]
     c1: f64,
 
-    /// C2 of PSO
+    /// C2 of PSO; 0.0 to 2.5
     #[arg(long, default_value_t = 0.5)]
     c2: f64,
 }
