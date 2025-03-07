@@ -78,14 +78,14 @@ fn main() -> anyhow::Result<()> {
 
     // define exploration intervals and remaining algorithmic parameters
     let restart_interval_evaluations = [evaluations as f64 * 0.1, evaluations as f64 * 0.2];
-    let restart_interval_exploration = [0.05, 0.1, 0.2];
+    let restart_interval_diversity = [0.05, 0.1, 0.2];
     let restarts_evaluations = vec!["evaluations"];
-    let restarts_exploration = vec!["exploration"];
+    let restarts_diversity = vec!["diversity"];
     let replacements = ["best", "worst", "random"];
     let leader_options = ["random_new", "best", "random_solution"];
 
     let mut configs_eval_restart: Vec<_> = iproduct!(restarts_evaluations, restart_interval_evaluations, replacements, leader_options).collect();
-    let mut configs: Vec<_> = iproduct!(restarts_exploration, restart_interval_exploration, replacements, leader_options).collect();
+    let mut configs: Vec<_> = iproduct!(restarts_diversity, restart_interval_diversity, replacements, leader_options).collect();
     configs.append(&mut configs_eval_restart);
 
     // set the benchmark problems

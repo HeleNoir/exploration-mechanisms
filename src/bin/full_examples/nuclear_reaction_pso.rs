@@ -76,23 +76,22 @@ fn main() -> anyhow::Result<()> {
     let folder = format!("data/nuclear_reaction_PSO/d{:?}_p{:?}", dimensions, pop_size);
 
     // set number of runs per instance
-    // TODO set correctly after testing
-    let runs: [usize; 5] = (1..=5).collect::<Vec<_>>()
+    let runs: [usize; 5] = (1..=25).collect::<Vec<_>>()
         .try_into().expect("wrong size iterator");
     // set number of evaluations
     let evaluations: u32 = (10000 * dimensions) as u32;
 
     // define exploration intervals and remaining algorithmic parameters
     let restart_interval_evaluations = [evaluations as f64 * 0.1, evaluations as f64 * 0.2];
-    let restart_interval_exploration = [0.05, 0.1, 0.2];
+    let restart_interval_diversity = [0.05, 0.1, 0.2];
     let restarts_evaluations = vec!["evaluations"];
-    let restarts_exploration = vec!["exploration"];
+    let restarts_diversity = vec!["diversity"];
     let replacements = ["best", "worst", "random"];
     let termination_type: &str = "evaluations";
     let termination_value: usize = evaluations as usize;
 
     let mut configs_eval_restart: Vec<_> = iproduct!(restarts_evaluations, restart_interval_evaluations, replacements).collect();
-    let mut configs: Vec<_> = iproduct!(restarts_exploration, restart_interval_exploration, replacements).collect();
+    let mut configs: Vec<_> = iproduct!(restarts_diversity, restart_interval_diversity, replacements).collect();
     configs.append(&mut configs_eval_restart);
 
     // set the benchmark problems

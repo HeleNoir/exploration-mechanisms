@@ -71,9 +71,7 @@ fn main() -> anyhow::Result<()> {
     let inertia_weight: f64 = args.inertia_weight;
     let c1: f64 = args.c1;
     let c2: f64 = args.c2;
-
-    let folder = format!("data/irace_PSO/d{:?}_p{:?}", dimensions, pop_size);
-
+    
     // Start timing execution
     let start = Instant::now();
     
@@ -103,44 +101,14 @@ fn main() -> anyhow::Result<()> {
             c2, // C2
             v_max,
         );
-        
-        let output = format!("{}{}{}{}{}{}{}{}{}",
-                             instance.name(),
-                             "_",
-                             pop_size,
-                             "_",
-                             inertia_weight,
-                             "_",
-                             c1,
-                             "_",
-                             c2,
-        );
-
-        let data_dir = Arc::new(PathBuf::from(&folder));
-        fs::create_dir_all(data_dir.as_ref()).expect("TODO: panic message");
-
-        let experiment_desc = output;
-        let log_file = data_dir.join(format!("{}.cbor", experiment_desc));
 
         // This executes the algorithm
         let setup = conf.optimize_with(&instance, |state: &mut State<_>| -> ExecResult<()> {
             state.insert_evaluator(evaluator);
             state.insert(Random::new(seed));
-            state.configure_log(|con| {
-                con
-                    .with_many(
-                        conditions::EveryN::iterations(100),
-                        [
-                            ValueOf::<common::Evaluations>::entry(),
-                            BestObjectiveValueLens::entry(),
-                        ],
-                    )
-                ;
-                Ok(())
-            })
+            Ok(())
         });
         let results = setup.unwrap();
-        results.log().to_cbor(log_file).expect("TODO: panic message");
 
         // Measure elapsed time
         let duration = start.elapsed();

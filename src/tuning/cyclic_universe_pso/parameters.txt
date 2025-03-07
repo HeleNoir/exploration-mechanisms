@@ -25,21 +25,11 @@
 ##    other parameters. This expression must return TRUE if the 
 ##    condition is satisfied, FALSE otherwise.
 
-# 1:            2:                   3:     4:      5:
-y               "--y "                c      (1, 2)
-crossover       "--crossover "        c      ("bin", "exp")
-history         "--history "          i      (1, 1000)
-
-#param1          "--param1 "          i      (1, 10) | mode %in% c("x1", "x2")
-#param2          "--param2 "          i      (1, 10) | (mode %in% c("x1", "x3")) & (real > 2.5) & (real <= 3.5)
-#mode            "--"                 c      ("x1" ,"x2", "x3")
-#real            "--paramreal="       r      (1.5, 4.5)
-#logreal         "--param-logreal="   r,log  (1, 100) # Logarithmic scale
-#mutation        "--mutation="        o      ("none", "very low", "low", "medium", "high", "very high", "all")
-#unused         "-u "                c      (1, 2, 10, 20)
-
-#[forbidden]
-#mode == "x1" & mutation == "low"
+# 1:            2:                   3:     4:                              5:
+exploration     "--exploration "     c      ("evaluations", "diversity")
+exp_param       "--exp-param "       c      (0.05, 0.1, 0.2)
+new_pop         "--new-pop "         i      (1, 50)
+replacement     "--replacement "     c      ("best", "worst", "random")
 
 [global]
 digits = 4 # Maximum number of decimal places that are significant for numerical (real) parameters.

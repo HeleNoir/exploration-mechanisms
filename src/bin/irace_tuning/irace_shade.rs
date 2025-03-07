@@ -72,9 +72,7 @@ fn main() -> anyhow::Result<()> {
     let y = args.y;
     let cr_operator = args.crossover;
     let history = args.history;
-
-    let folder = format!("data/irace_shade/d{:?}_p{:?}", dimensions, pop_size);
-
+    
     // define remaining algorithmic parameters according to Tanabe and Fukunaga 2013
     let max_archive = pop_size as usize;
     let p_min = 2.0 / pop_size as f64;
@@ -113,50 +111,14 @@ fn main() -> anyhow::Result<()> {
             f, // initial value of F; of no consequence when using SHADEAdaptation
             crossover, // exp or bin
         );
-        
-        let output = format!("{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}",
-                             instance.name(),
-                             "_",
-                             pop_size,
-                             "_",
-                             y,
-                             "_",
-                             p_min,
-                             "_",
-                             max_archive,
-                             "_",
-                             history,
-                             "_",
-                             f,
-                             "_",
-                             cr_operator
-        );
-
-        let data_dir = Arc::new(PathBuf::from(&folder));
-        fs::create_dir_all(data_dir.as_ref()).expect("TODO: panic message");
-
-        let experiment_desc = output;
-        let log_file = data_dir.join(format!("{}.cbor", experiment_desc));
 
         // This executes the algorithm
         let setup = conf.optimize_with(&instance, |state: &mut State<_>| -> ExecResult<()> {
             state.insert_evaluator(evaluator);
             state.insert(Random::new(seed));
-            state.configure_log(|con| {
-                con
-                    .with_many(
-                        conditions::EveryN::iterations(100),
-                        [
-                            ValueOf::<common::Evaluations>::entry(),
-                            BestObjectiveValueLens::entry(),
-                        ],
-                    )
-                ;
-                Ok(())
-            })
+            Ok(())
         });
         let results = setup.unwrap();
-        results.log().to_cbor(log_file).expect("TODO: panic message");
 
         // Measure elapsed time
         let duration = start.elapsed();
