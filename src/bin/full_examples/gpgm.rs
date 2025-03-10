@@ -19,7 +19,7 @@ use mahf::conditions::common::PartialEqChecker;
 use mahf::prelude::common::Evaluations;
 use mahf::problems::LimitedVectorProblem;
 use rayon::prelude::*;
-use crate::algorithms::pso_nuclear_reaction::nuclear_reaction_pso;
+use crate::algorithms::pso_gpgm::gpgm_pso;
 
 static CONTEXT: Lazy<Context<C>> = Lazy::new(Context::default);
 
@@ -151,7 +151,7 @@ fn main() -> anyhow::Result<()> {
                     };
 
                     // This is the main setup of the algorithm
-                    let conf: Configuration<Instance> = nuclear_reaction_pso(
+                    let conf: Configuration<Instance> = gpgm_pso(
                         evaluations,
                         pop_size,
                         inertia_weight, // Weight

@@ -17,7 +17,7 @@ use mahf::components::measures::diversity::{MinimumIndividualDistance, Normalize
 use mahf::conditions::common::PartialEqChecker;
 use mahf::prelude::common::Evaluations;
 use mahf::problems::LimitedVectorProblem;
-use crate::algorithms::pso_random_restarts::random_restart_pso;
+use crate::algorithms::pso_rr::random_restart_pso;
 
 static CONTEXT: Lazy<Context<C>> = Lazy::new(Context::default);
 

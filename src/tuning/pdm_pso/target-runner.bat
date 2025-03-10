@@ -19,7 +19,7 @@
 ::##############################################################################
 
 :: Please change the EXE and FIXED_PARAMS to the correct ones
-SET "exe=cargo run --release --package exploration-mechanisms --bin irace_stepped_leader_pso --"
+SET "exe=cargo run --release --package exploration-mechanisms --bin irace_pdm_pso --"
 :: TODO update PSO parameters
 SET "fixed_params= --dimensions 10 --population-size 50 --inertia-weight 0.7 --c1 1.2 --c2 1.2"
 

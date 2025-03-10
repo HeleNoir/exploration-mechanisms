@@ -1,11 +1,11 @@
 use mahf::{prelude::*,
            components::{initialization,
-                        measures::{diversity::{MinimumIndividualDistance},}},
+                        measures::{diversity::{MinimumIndividualDistance}, }},
            configuration::Configuration, logging::Logger,
            problems::{LimitedVectorProblem, SingleObjectiveProblem, KnownOptimumProblem}};
-use mahf::identifier::{Global, Identifier};
+use mahf::identifier::Global;
 
-pub fn random_restart_pso<P>(
+pub fn gpgm_pso<P>(
     evaluations: u32,
     population_size: u32,
     w: f64,
@@ -13,6 +13,11 @@ pub fn random_restart_pso<P>(
     c2: f64,
     v_max: f64,
     condition: Box<dyn Condition<P>>,
+    new_pop: u32,
+    mu: f64,
+    termination_type: String,
+    termination_value: usize,
+    replacement: Box<dyn Component<P>>,
 ) -> Configuration<P>
 where P: SingleObjectiveProblem + LimitedVectorProblem<Element = f64> + KnownOptimumProblem,
 {
@@ -29,10 +34,10 @@ where P: SingleObjectiveProblem + LimitedVectorProblem<Element = f64> + KnownOpt
                 builder
                     .if_else_(condition, |builder| {
                         builder
-                            .do_(initialization::RandomSpread::new(population_size))
-                            .evaluate_with::<Global>()
-                            .update_best_individual()
-                            .do_(Box::from(swarm::pso::ParticleSwarmInit::new(v_max)))
+                            .do_(selection::All::new())
+                            .do_(swarm::nfnf::NuclearReactionMechanism::new(new_pop, mu, termination_type, termination_value))
+                            .do_(boundary::CosineCorrection::new())
+                            .do_(replacement)
                     }, |builder| {
                         builder
                             .do_(Box::from(swarm::pso::ParticleVelocitiesUpdate::new(
@@ -41,10 +46,10 @@ where P: SingleObjectiveProblem + LimitedVectorProblem<Element = f64> + KnownOpt
                                 c2,
                                 v_max,
                             )))
-                            .do_(boundary::CompleteOneTailedNormalCorrection::new())
-                            .evaluate_with::<Global>()
-                            .update_best_individual()
+                            .do_(boundary::CosineCorrection::new())
                     })
+                    .evaluate_with::<Global>()
+                    .update_best_individual()
                     .do_(MinimumIndividualDistance::new())
                     .do_(swarm::pso::ParticleSwarmUpdate::new())
                     .do_(Logger::new())

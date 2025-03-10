@@ -19,7 +19,7 @@ parameterFile = "./parameters.txt"
 
 ## File to save tuning results as an R dataset, either absolute path or
 ## relative to execDir.
-logFile = "./nr_pso_irace.Rdata"
+logFile = "./srm_pso_irace.Rdata"
 
 ## Directory where training instances are located; either absolute path or
 ## relative to current directory. If no `trainInstancesFiles` is provided, all

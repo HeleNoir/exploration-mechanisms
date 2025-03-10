@@ -17,7 +17,7 @@ use mahf::components::measures::diversity::{MinimumIndividualDistance, Normalize
 use mahf::conditions::common::PartialEqChecker;
 use mahf::prelude::common::Evaluations;
 use mahf::problems::LimitedVectorProblem;
-use crate::algorithms::pso_cyclic_universe::cyclic_universe_pso;
+use crate::algorithms::pso_gpgm::gpgm_pso;
 
 static CONTEXT: Lazy<Context<C>> = Lazy::new(Context::default);
 
@@ -59,7 +59,7 @@ struct Args {
     /// C2 of PSO
     #[arg(long, default_value_t = 0.5)]
     c2: f64,
-    
+
     /// Exploration condition; evaluations or diversity
     #[arg(long, default_value = "evaluations")]
     exploration: String,
@@ -67,14 +67,19 @@ struct Args {
     /// Exploration parameter
     #[arg(long, default_value_t = 0.05)]
     exp_param: f64,
-
+    
     /// Population size of exploration mechanism, number of individuals that will be replaced; 1 to pop_size
     #[arg(long, default_value_t = 5)]
     new_pop: u32,
-    
+
     /// Solutions to be replaced; best, worst or random
     #[arg(long, default_value = "best")]
     replacement: String,
+
+    /// Magnification factor of nuclear reaction mechanism; original between 10^0 and 10^20;
+    /// smaller values (probably) lead to more exploration
+    #[arg(long, default_value_t = 100.0)]
+    mu: f64,
 }
 
 
@@ -94,12 +99,16 @@ fn main() -> anyhow::Result<()> {
     let exp_param: f64 = args.exp_param;
     let new_pop: u32 = args.new_pop;
     let replacement = args.replacement;
+    let mu: f64 = args.mu;
     
     // Start timing execution
     let start = Instant::now();
 
     // set number of evaluations
     let evaluations: u32 = (10000 * dimensions) as u32;
+
+    let termination_type: &str = "evaluations";
+    let termination_value: usize = evaluations as usize;
 
     let options = Options::new()
         .with_dimensions([dimensions])
@@ -131,16 +140,19 @@ fn main() -> anyhow::Result<()> {
         };
 
         // This is the main setup of the algorithm
-        let conf: Configuration<Instance> = cyclic_universe_pso(
+        let conf: Configuration<Instance> = gpgm_pso(
             evaluations,
             pop_size,
             inertia_weight, // Weight
             c1, // C1
             c2, // C2
             v_max,
-            condition,
-            new_pop,
-            replacement_operator,
+            condition, // exploration mechanism condition
+            new_pop, // number of new solutions the exploration mechanism generates
+            mu, // magnification factor
+            termination_type.parse().unwrap(), // termination criterion, either iterations or evaluations
+            termination_value, // termination criterion value
+            replacement_operator, // replacement operator applied after exploration mechanism
         );
 
         // This executes the algorithm

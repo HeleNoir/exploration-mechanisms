@@ -19,7 +19,7 @@ use mahf::conditions::common::PartialEqChecker;
 use mahf::prelude::common::Evaluations;
 use mahf::problems::LimitedVectorProblem;
 use rayon::prelude::*;
-use crate::algorithms::pso_mine_explosion::mine_explosion_pso;
+use crate::algorithms::pso_srm::srm_pso;
 
 static CONTEXT: Lazy<Context<C>> = Lazy::new(Context::default);
 
@@ -144,7 +144,7 @@ fn main() -> anyhow::Result<()> {
                     };
 
                     // This is the main setup of the algorithm
-                    let conf: Configuration<Instance> = mine_explosion_pso(
+                    let conf: Configuration<Instance> = srm_pso(
                         evaluations,
                         pop_size,
                         inertia_weight, // Weight

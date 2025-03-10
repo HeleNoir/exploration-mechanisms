@@ -19,7 +19,7 @@ use mahf::conditions::common::PartialEqChecker;
 use mahf::problems::LimitedVectorProblem;
 use mahf::state::common::Evaluations;
 use rayon::prelude::*;
-use crate::algorithms::pso_random_restarts::random_restart_pso;
+use crate::algorithms::pso_rr::random_restart_pso;
 
 static CONTEXT: Lazy<Context<C>> = Lazy::new(Context::default);
 

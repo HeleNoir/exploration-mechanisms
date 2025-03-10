@@ -32,7 +32,7 @@ where P: SingleObjectiveProblem + LimitedVectorProblem<Element = f64>,
                         c2,
                         v_max,
                     )))
-                    .do_(boundary::CompleteOneTailedNormalCorrection::new())
+                    .do_(boundary::CosineCorrection::new())
                     .evaluate()
                     .update_best_individual()
                     .do_(MinimumIndividualDistance::new())

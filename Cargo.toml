@@ -28,20 +28,20 @@ name = "random_restart_pso"
 path = "src/bin/full_examples/random_restart_pso.rs"
 
 [[bin]]
-name = "cyclic_universe_pso"
-path = "src/bin/full_examples/cyclic_universe_pso.rs"
+name = "npgm_pso"
+path = "src/bin/full_examples/npgm_pso.rs"
 
 [[bin]]
-name = "nuclear_reaction_pso"
-path = "src/bin/full_examples/nuclear_reaction_pso.rs"
+name = "gpgm_pso"
+path = "src/bin/full_examples/gpgm.rs"
 
 [[bin]]
-name = "mine_explosion_pso"
-path = "src/bin/full_examples/mine_explosion_pso.rs"
+name = "srm_pso"
+path = "src/bin/full_examples/srm_pso.rs"
 
 [[bin]]
-name = "stepped_leader_pso"
-path = "src/bin/full_examples/stepped_leader_pso.rs"
+name = "pdm_pso"
+path = "src/bin/full_examples/pdm_pso.rs"
 
 [[bin]]
 name = "irace_pso"
@@ -56,19 +56,19 @@ name = "irace_random_restart_pso"
 path = "src/bin/irace_tuning/irace_random_restart_pso.rs"
 
 [[bin]]
-name = "irace_cyclic_universe_pso"
-path = "src/bin/irace_tuning/irace_cyclic_universe_pso.rs"
+name = "irace_npgm_pso"
+path = "src/bin/irace_tuning/irace_npgm_pso.rs"
 
 [[bin]]
-name = "irace_mine_explosion_pso"
-path = "src/bin/irace_tuning/irace_mine_explosion_pso.rs"
+name = "irace_srm_pso"
+path = "src/bin/irace_tuning/irace_srm_pso.rs"
 
 [[bin]]
-name = "irace_nuclear_reaction_pso"
-path = "src/bin/irace_tuning/irace_nuclear_reaction_pso.rs"
+name = "irace_gpgm_pso"
+path = "src/bin/irace_tuning/irace_gpgm_pso.rs"
 
 [[bin]]
-name = "irace_stepped_leader_pso"
-path = "src/bin/irace_tuning/irace_stepped_leader_pso.rs"
+name = "irace_pdm_pso"
+path = "src/bin/irace_tuning/irace_pdm_pso.rs"
 
 

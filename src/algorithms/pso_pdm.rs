@@ -5,7 +5,7 @@ use mahf::{prelude::*,
            problems::{LimitedVectorProblem, SingleObjectiveProblem, KnownOptimumProblem}};
 use mahf::identifier::Global;
 
-pub fn cyclic_universe_pso<P>(
+pub fn pdm_pso<P>(
     evaluations: u32,
     population_size: u32,
     w: f64,
@@ -14,6 +14,7 @@ pub fn cyclic_universe_pso<P>(
     v_max: f64,
     condition: Box<dyn Condition<P>>,
     new_pop: u32,
+    leader: String,
     replacement: Box<dyn Component<P>>,
 ) -> Configuration<P>
 where P: SingleObjectiveProblem + LimitedVectorProblem<Element = f64> + KnownOptimumProblem,
@@ -32,8 +33,8 @@ where P: SingleObjectiveProblem + LimitedVectorProblem<Element = f64> + KnownOpt
                     .if_else_(condition, |builder| {
                         builder
                             .do_(selection::All::new())
-                            .do_(swarm::bbbc::CyclicUniverseMechanism::new(new_pop))
-                            .do_(boundary::CompleteOneTailedNormalCorrection::new())
+                            .do_(swarm::lsa::NegativelyChargedSteppedLeader::new(new_pop, leader))
+                            .do_(boundary::CosineCorrection::new())
                             .do_(replacement)
                     }, |builder| {
                         builder
@@ -43,7 +44,7 @@ where P: SingleObjectiveProblem + LimitedVectorProblem<Element = f64> + KnownOpt
                                 c2,
                                 v_max,
                             )))
-                            .do_(boundary::CompleteOneTailedNormalCorrection::new())
+                            .do_(boundary::CosineCorrection::new())
                     })
                     .evaluate_with::<Global>()
                     .update_best_individual()

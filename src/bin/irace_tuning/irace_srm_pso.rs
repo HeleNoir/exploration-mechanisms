@@ -17,7 +17,7 @@ use mahf::components::measures::diversity::{MinimumIndividualDistance, Normalize
 use mahf::conditions::common::PartialEqChecker;
 use mahf::prelude::common::Evaluations;
 use mahf::problems::LimitedVectorProblem;
-use crate::algorithms::pso_nuclear_reaction::nuclear_reaction_pso;
+use crate::algorithms::pso_srm::srm_pso;
 
 static CONTEXT: Lazy<Context<C>> = Lazy::new(Context::default);
 
@@ -67,7 +67,7 @@ struct Args {
     /// Exploration parameter
     #[arg(long, default_value_t = 0.05)]
     exp_param: f64,
-    
+
     /// Population size of exploration mechanism, number of individuals that will be replaced; 1 to pop_size
     #[arg(long, default_value_t = 5)]
     new_pop: u32,
@@ -75,11 +75,10 @@ struct Args {
     /// Solutions to be replaced; best, worst or random
     #[arg(long, default_value = "best")]
     replacement: String,
-
-    /// Magnification factor of nuclear reaction mechanism; original between 10^0 and 10^20;
-    /// smaller values (probably) lead to more exploration
-    #[arg(long, default_value_t = 100.0)]
-    mu: f64,
+    
+    /// Solution to be used as center; best, random_new or random_solution
+    #[arg(long, default_value = "best")]
+    center: String,
 }
 
 
@@ -99,16 +98,13 @@ fn main() -> anyhow::Result<()> {
     let exp_param: f64 = args.exp_param;
     let new_pop: u32 = args.new_pop;
     let replacement = args.replacement;
-    let mu: f64 = args.mu;
+    let center = args.center;
     
     // Start timing execution
     let start = Instant::now();
 
     // set number of evaluations
     let evaluations: u32 = (10000 * dimensions) as u32;
-
-    let termination_type: &str = "evaluations";
-    let termination_value: usize = evaluations as usize;
 
     let options = Options::new()
         .with_dimensions([dimensions])
@@ -123,6 +119,8 @@ fn main() -> anyhow::Result<()> {
         let lower = bounds[0].start.clone();
         let upper = bounds[0].end.clone();
         let v_max = (upper - lower) / 2.0;
+        
+        let center_solution = center.parse().unwrap();
 
         let condition = if exploration == "evaluations" {
             let eval_interval = exp_param * evaluations as f64;
@@ -140,7 +138,7 @@ fn main() -> anyhow::Result<()> {
         };
 
         // This is the main setup of the algorithm
-        let conf: Configuration<Instance> = nuclear_reaction_pso(
+        let conf: Configuration<Instance> = srm_pso(
             evaluations,
             pop_size,
             inertia_weight, // Weight
@@ -149,9 +147,7 @@ fn main() -> anyhow::Result<()> {
             v_max,
             condition, // exploration mechanism condition
             new_pop, // number of new solutions the exploration mechanism generates
-            mu, // magnification factor
-            termination_type.parse().unwrap(), // termination criterion, either iterations or evaluations
-            termination_value, // termination criterion value
+            center_solution, // center solution that provides basis for generating new solutions
             replacement_operator, // replacement operator applied after exploration mechanism
         );
 

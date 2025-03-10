@@ -17,7 +17,7 @@ use mahf::components::measures::diversity::{MinimumIndividualDistance, Normalize
 use mahf::conditions::common::PartialEqChecker;
 use mahf::prelude::common::Evaluations;
 use mahf::problems::LimitedVectorProblem;
-use crate::algorithms::pso_stepped_leader::stepped_leader_pso;
+use crate::algorithms::pso_npgm::npgm_pso;
 
 static CONTEXT: Lazy<Context<C>> = Lazy::new(Context::default);
 
@@ -33,7 +33,7 @@ struct Args {
     inst: String,
 
     /// Number of BBOB function
-    #[arg(long, default_value_t = 18)]
+    #[arg(long, default_value_t = 1)]
     function: usize,
 
     /// Instance of BBOB function
@@ -59,26 +59,22 @@ struct Args {
     /// C2 of PSO
     #[arg(long, default_value_t = 0.5)]
     c2: f64,
-
+    
     /// Exploration condition; evaluations or diversity
     #[arg(long, default_value = "evaluations")]
     exploration: String,
 
     /// Exploration parameter
-    #[arg(long, default_value_t = 0.2)]
+    #[arg(long, default_value_t = 0.05)]
     exp_param: f64,
-    
+
     /// Population size of exploration mechanism, number of individuals that will be replaced; 1 to pop_size
-    #[arg(long, default_value_t = 29)]
+    #[arg(long, default_value_t = 5)]
     new_pop: u32,
-
+    
     /// Solutions to be replaced; best, worst or random
-    #[arg(long, default_value = "worst")]
+    #[arg(long, default_value = "best")]
     replacement: String,
-
-    /// Solution to be used as leader; best, random_new or random_solution
-    #[arg(long, default_value = "random_solution")]
-    leader: String,
 }
 
 
@@ -98,7 +94,6 @@ fn main() -> anyhow::Result<()> {
     let exp_param: f64 = args.exp_param;
     let new_pop: u32 = args.new_pop;
     let replacement = args.replacement;
-    let leader = args.leader;
     
     // Start timing execution
     let start = Instant::now();
@@ -120,9 +115,6 @@ fn main() -> anyhow::Result<()> {
         let upper = bounds[0].end.clone();
         let v_max = (upper - lower) / 2.0;
 
-
-        let leader_solution = leader.parse().unwrap();
-
         let condition = if exploration == "evaluations" {
             let eval_interval = exp_param * evaluations as f64;
             conditions::StagnationForN::new(eval_interval as usize, ValueOf::<Evaluations>::new(), BestObjectiveValueLens::new(), PartialEqChecker::new())
@@ -139,17 +131,16 @@ fn main() -> anyhow::Result<()> {
         };
 
         // This is the main setup of the algorithm
-        let conf: Configuration<Instance> = stepped_leader_pso(
+        let conf: Configuration<Instance> = npgm_pso(
             evaluations,
             pop_size,
             inertia_weight, // Weight
             c1, // C1
             c2, // C2
             v_max,
-            condition, // exploration mechanism condition
-            new_pop, // number of new solutions the exploration mechanism generates
-            leader_solution, // leader solution that provides basis for generating new solutions
-            replacement_operator, // replacement operator applied after exploration mechanism
+            condition,
+            new_pop,
+            replacement_operator,
         );
 
         // This executes the algorithm
@@ -158,6 +149,7 @@ fn main() -> anyhow::Result<()> {
             state.insert(Random::new(seed));
             Ok(())
         });
+        
         let results = setup.unwrap();
 
         // Measure elapsed time

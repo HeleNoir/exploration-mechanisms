@@ -17,7 +17,7 @@ use mahf::components::measures::diversity::{MinimumIndividualDistance, Normalize
 use mahf::conditions::common::PartialEqChecker;
 use mahf::prelude::common::Evaluations;
 use mahf::problems::LimitedVectorProblem;
-use crate::algorithms::pso_mine_explosion::mine_explosion_pso;
+use crate::algorithms::pso_pdm::pdm_pso;
 
 static CONTEXT: Lazy<Context<C>> = Lazy::new(Context::default);
 
@@ -33,7 +33,7 @@ struct Args {
     inst: String,
 
     /// Number of BBOB function
-    #[arg(long, default_value_t = 1)]
+    #[arg(long, default_value_t = 18)]
     function: usize,
 
     /// Instance of BBOB function
@@ -65,20 +65,20 @@ struct Args {
     exploration: String,
 
     /// Exploration parameter
-    #[arg(long, default_value_t = 0.05)]
+    #[arg(long, default_value_t = 0.2)]
     exp_param: f64,
-
+    
     /// Population size of exploration mechanism, number of individuals that will be replaced; 1 to pop_size
-    #[arg(long, default_value_t = 5)]
+    #[arg(long, default_value_t = 29)]
     new_pop: u32,
 
     /// Solutions to be replaced; best, worst or random
-    #[arg(long, default_value = "best")]
+    #[arg(long, default_value = "worst")]
     replacement: String,
-    
-    /// Solution to be used as center; best, random_new or random_solution
-    #[arg(long, default_value = "best")]
-    center: String,
+
+    /// Solution to be used as leader; best, random_new or random_solution
+    #[arg(long, default_value = "random_solution")]
+    leader: String,
 }
 
 
@@ -98,7 +98,7 @@ fn main() -> anyhow::Result<()> {
     let exp_param: f64 = args.exp_param;
     let new_pop: u32 = args.new_pop;
     let replacement = args.replacement;
-    let center = args.center;
+    let leader = args.leader;
     
     // Start timing execution
     let start = Instant::now();
@@ -119,8 +119,9 @@ fn main() -> anyhow::Result<()> {
         let lower = bounds[0].start.clone();
         let upper = bounds[0].end.clone();
         let v_max = (upper - lower) / 2.0;
-        
-        let center_solution = center.parse().unwrap();
+
+
+        let leader_solution = leader.parse().unwrap();
 
         let condition = if exploration == "evaluations" {
             let eval_interval = exp_param * evaluations as f64;
@@ -138,7 +139,7 @@ fn main() -> anyhow::Result<()> {
         };
 
         // This is the main setup of the algorithm
-        let conf: Configuration<Instance> = mine_explosion_pso(
+        let conf: Configuration<Instance> = pdm_pso(
             evaluations,
             pop_size,
             inertia_weight, // Weight
@@ -147,7 +148,7 @@ fn main() -> anyhow::Result<()> {
             v_max,
             condition, // exploration mechanism condition
             new_pop, // number of new solutions the exploration mechanism generates
-            center_solution, // center solution that provides basis for generating new solutions
+            leader_solution, // leader solution that provides basis for generating new solutions
             replacement_operator, // replacement operator applied after exploration mechanism
         );
 
@@ -157,7 +158,6 @@ fn main() -> anyhow::Result<()> {
             state.insert(Random::new(seed));
             Ok(())
         });
-        
         let results = setup.unwrap();
 
         // Measure elapsed time

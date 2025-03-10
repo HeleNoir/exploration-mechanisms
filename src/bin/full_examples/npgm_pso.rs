@@ -19,7 +19,7 @@ use mahf::conditions::common::PartialEqChecker;
 use mahf::prelude::common::Evaluations;
 use mahf::problems::LimitedVectorProblem;
 use rayon::prelude::*;
-use crate::algorithms::pso_stepped_leader::stepped_leader_pso;
+use crate::algorithms::pso_npgm::npgm_pso;
 
 static CONTEXT: Lazy<Context<C>> = Lazy::new(Context::default);
 
@@ -67,11 +67,10 @@ fn main() -> anyhow::Result<()> {
     let c2: f64 = args.c2;
     let new_pop: u32 = args.new_pop;
 
-    let folder = format!("data/stepped_leader_PSO/d{:?}_p{:?}", dimensions, pop_size);
+    let folder = format!("data/cyclic_universe_PSO/d{:?}_p{:?}", dimensions, pop_size);
 
     // set number of runs per instance
-    // TODO set correctly after testing
-    let runs: [usize; 5] = (1..=5).collect::<Vec<_>>()
+    let runs: [usize; 5] = (1..=25).collect::<Vec<_>>()
         .try_into().expect("wrong size iterator");
     // set number of evaluations
     let evaluations: u32 = (10000 * dimensions) as u32;
@@ -82,10 +81,9 @@ fn main() -> anyhow::Result<()> {
     let restarts_evaluations = vec!["evaluations"];
     let restarts_diversity = vec!["diversity"];
     let replacements = ["best", "worst", "random"];
-    let leader_options = ["random_new", "best", "random_solution"];
 
-    let mut configs_eval_restart: Vec<_> = iproduct!(restarts_evaluations, restart_interval_evaluations, replacements, leader_options).collect();
-    let mut configs: Vec<_> = iproduct!(restarts_diversity, restart_interval_diversity, replacements, leader_options).collect();
+    let mut configs_eval_restart: Vec<_> = iproduct!(restarts_evaluations, restart_interval_evaluations, replacements).collect();
+    let mut configs: Vec<_> = iproduct!(restarts_diversity, restart_interval_diversity, replacements).collect();
     configs.append(&mut configs_eval_restart);
 
     // set the benchmark problems
@@ -135,7 +133,7 @@ fn main() -> anyhow::Result<()> {
                     } else {
                         conditions::LessThanN::new(config.1, NormalizedDiversityLens::<MinimumIndividualDistance>::new())
                     };
-
+                    
                     let replacement = if config.2 == "best" {
                         replacement::pso::ReplaceNBestPSO::new(new_pop, v_max)
                     } else if config.2 == "worst" {
@@ -145,7 +143,7 @@ fn main() -> anyhow::Result<()> {
                     };
 
                     // This is the main setup of the algorithm
-                    let conf: Configuration<Instance> = stepped_leader_pso(
+                    let conf: Configuration<Instance> = npgm_pso(
                         evaluations,
                         pop_size,
                         inertia_weight, // Weight
@@ -154,11 +152,10 @@ fn main() -> anyhow::Result<()> {
                         v_max,
                         condition, // exploration mechanism condition
                         new_pop, // number of new solutions the exploration mechanism generates
-                        config.3.parse().unwrap(), // leader solution that provides basis for generating new solutions
                         replacement, // replacement operator applied after exploration mechanism
                     );
 
-                    let output = format!("{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}",
+                    let output = format!("{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}",
                                          run,
                                          "_",
                                          instance.name(),
@@ -176,8 +173,6 @@ fn main() -> anyhow::Result<()> {
                                          config.1,
                                          "_",
                                          new_pop,
-                                         "_",
-                                         config.3,
                                          "_",
                                          config.2,
                     );
