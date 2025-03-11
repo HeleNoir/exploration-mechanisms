@@ -20,7 +20,7 @@
 
 :: Please change the EXE and FIXED_PARAMS to the correct ones
 SET "exe=cargo run --release --package exploration-mechanisms --bin irace_pso --"
-SET "fixed_params= --dimensions 10 --population-size 50"
+SET "fixed_params= --population-size 50"
 
 FOR /f "tokens=1-4*" %%a IN ("%*") DO (
 	SET candidate=%%a

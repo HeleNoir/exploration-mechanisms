@@ -21,7 +21,7 @@
 :: Please change the EXE and FIXED_PARAMS to the correct ones
 SET "exe=cargo run --release --package exploration-mechanisms --bin irace_random_restart_pso --"
 :: TODO update PSO parameters
-SET "fixed_params= --dimensions 10 --population-size 50 --inertia-weight 0.7 --c1 1.2 --c2 1.2"
+SET "fixed_params= --population-size 50 --inertia-weight 0.7 --c1 1.2 --c2 1.2"
 
 FOR /f "tokens=1-4*" %%a IN ("%*") DO (
 	SET candidate=%%a

@@ -20,28 +20,33 @@ clap = { version = "4.5.11", features = ["derive"] }
 mahf = { git = "https://github.com/mahf-opt/mahf", branch = "exploration-operators" }
 
 [[bin]]
-name = "basic_pso"
-path = "src/bin/full_examples/basic_pso.rs"
+name = "pso"
+path = "src/bin/exploration_experiment/pso.rs"
 
 [[bin]]
-name = "random_restart_pso"
-path = "src/bin/full_examples/random_restart_pso.rs"
+name = "pso_rr"
+path = "src/bin/exploration_experiment/pso_rr.rs"
 
 [[bin]]
-name = "npgm_pso"
-path = "src/bin/full_examples/npgm_pso.rs"
+name = "pso_npgm"
+path = "src/bin/exploration_experiment/pso_npgm.rs"
 
 [[bin]]
-name = "gpgm_pso"
-path = "src/bin/full_examples/gpgm.rs"
+name = "pso_gpgm"
+path = "src/bin/exploration_experiment/pso_gpgm.rs"
 
 [[bin]]
-name = "srm_pso"
-path = "src/bin/full_examples/srm_pso.rs"
+name = "pso_srm"
+path = "src/bin/exploration_experiment/pso_srm.rs"
 
 [[bin]]
-name = "pdm_pso"
-path = "src/bin/full_examples/pdm_pso.rs"
+name = "pso_pdm"
+path = "src/bin/exploration_experiment/pso_pdm.rs"
+
+[[bin]]
+name = "shade"
+path = "src/bin/exploration_experiment/shade.rs"
+
 
 [[bin]]
 name = "irace_pso"

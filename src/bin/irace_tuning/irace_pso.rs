@@ -1,15 +1,9 @@
 #[path = "../../algorithms/mod.rs"]
 mod algorithms;
 
-use mahf::{prelude::*, configuration::Configuration, Random,
-           lens::common::{BestObjectiveValueLens}};
+use mahf::{prelude::*, configuration::Configuration, Random};
 use mahf_coco::{Instance, AcceleratedEvaluator, Suite, Context, Options, backends::C, Name::Bbob};
 
-use std::{
-    fs::{self},
-    path::PathBuf,
-    sync::{Arc},
-};
 use std::time::Instant;
 use once_cell::sync::Lazy;
 use clap::Parser;

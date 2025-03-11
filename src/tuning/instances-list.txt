@@ -7,54 +7,102 @@
 
 # Empty lines and comments are ignored.
 
-"" --function 1 --instance 6
-"" --function 2 --instance 6
-"" --function 3 --instance 6
-"" --function 4 --instance 6
-"" --function 5 --instance 6
-"" --function 6 --instance 6
-"" --function 7 --instance 6
-"" --function 8 --instance 6
-"" --function 9 --instance 6
-"" --function 10 --instance 6
-"" --function 11 --instance 6
-"" --function 12 --instance 6
-"" --function 13 --instance 6
-"" --function 14 --instance 6
-"" --function 15 --instance 6
-"" --function 16 --instance 6
-"" --function 17 --instance 6
-"" --function 18 --instance 6
-"" --function 19 --instance 6
-"" --function 20 --instance 6
-"" --function 21 --instance 6
-"" --function 22 --instance 6
-"" --function 23 --instance 6
-"" --function 24 --instance 6
+"" --function 1 --instance 6 --dimensions 10
+"" --function 2 --instance 6 --dimensions 10
+"" --function 3 --instance 6 --dimensions 10
+"" --function 4 --instance 6 --dimensions 10
+"" --function 5 --instance 6 --dimensions 10
+"" --function 6 --instance 6 --dimensions 10
+"" --function 7 --instance 6 --dimensions 10
+"" --function 8 --instance 6 --dimensions 10
+"" --function 9 --instance 6 --dimensions 10
+"" --function 10 --instance 6 --dimensions 10
+"" --function 11 --instance 6 --dimensions 10
+"" --function 12 --instance 6 --dimensions 10
+"" --function 13 --instance 6 --dimensions 10
+"" --function 14 --instance 6 --dimensions 10
+"" --function 15 --instance 6 --dimensions 10
+"" --function 16 --instance 6 --dimensions 10
+"" --function 17 --instance 6 --dimensions 10
+"" --function 18 --instance 6 --dimensions 10
+"" --function 19 --instance 6 --dimensions 10
+"" --function 20 --instance 6 --dimensions 10
+"" --function 21 --instance 6 --dimensions 10
+"" --function 22 --instance 6 --dimensions 10
+"" --function 23 --instance 6 --dimensions 10
+"" --function 24 --instance 6 --dimensions 10
 
-"" --function 1 --instance 7
-"" --function 2 --instance 7
-"" --function 3 --instance 7
-"" --function 4 --instance 7
-"" --function 5 --instance 7
-"" --function 6 --instance 7
-"" --function 7 --instance 7
-"" --function 8 --instance 7
-"" --function 9 --instance 7
-"" --function 10 --instance 7
-"" --function 11 --instance 7
-"" --function 12 --instance 7
-"" --function 13 --instance 7
-"" --function 14 --instance 7
-"" --function 15 --instance 7
-"" --function 16 --instance 7
-"" --function 17 --instance 7
-"" --function 18 --instance 7
-"" --function 19 --instance 7
-"" --function 20 --instance 7
-"" --function 21 --instance 7
-"" --function 22 --instance 7
-"" --function 23 --instance 7
-"" --function 24 --instance 7
+"" --function 1 --instance 7 --dimensions 10
+"" --function 2 --instance 7 --dimensions 10
+"" --function 3 --instance 7 --dimensions 10
+"" --function 4 --instance 7 --dimensions 10
+"" --function 5 --instance 7 --dimensions 10
+"" --function 6 --instance 7 --dimensions 10
+"" --function 7 --instance 7 --dimensions 10
+"" --function 8 --instance 7 --dimensions 10
+"" --function 9 --instance 7 --dimensions 10
+"" --function 10 --instance 7 --dimensions 10
+"" --function 11 --instance 7 --dimensions 10
+"" --function 12 --instance 7 --dimensions 10
+"" --function 13 --instance 7 --dimensions 10
+"" --function 14 --instance 7 --dimensions 10
+"" --function 15 --instance 7 --dimensions 10
+"" --function 16 --instance 7 --dimensions 10
+"" --function 17 --instance 7 --dimensions 10
+"" --function 18 --instance 7 --dimensions 10
+"" --function 19 --instance 7 --dimensions 10
+"" --function 20 --instance 7 --dimensions 10
+"" --function 21 --instance 7 --dimensions 10
+"" --function 22 --instance 7 --dimensions 10
+"" --function 23 --instance 7 --dimensions 10
+"" --function 24 --instance 7 --dimensions 10
 
-#TODO check functions and instances
+"" --function 1 --instance 6 --dimensions 20
+"" --function 2 --instance 6 --dimensions 20
+"" --function 3 --instance 6 --dimensions 20
+"" --function 4 --instance 6 --dimensions 20
+"" --function 5 --instance 6 --dimensions 20
+"" --function 6 --instance 6 --dimensions 20
+"" --function 7 --instance 6 --dimensions 20
+"" --function 8 --instance 6 --dimensions 20
+"" --function 9 --instance 6 --dimensions 20
+"" --function 10 --instance 6 --dimensions 20
+"" --function 11 --instance 6 --dimensions 20
+"" --function 12 --instance 6 --dimensions 20
+"" --function 13 --instance 6 --dimensions 20
+"" --function 14 --instance 6 --dimensions 20
+"" --function 15 --instance 6 --dimensions 20
+"" --function 16 --instance 6 --dimensions 20
+"" --function 17 --instance 6 --dimensions 20
+"" --function 18 --instance 6 --dimensions 20
+"" --function 19 --instance 6 --dimensions 20
+"" --function 20 --instance 6 --dimensions 20
+"" --function 21 --instance 6 --dimensions 20
+"" --function 22 --instance 6 --dimensions 20
+"" --function 23 --instance 6 --dimensions 20
+"" --function 24 --instance 6 --dimensions 20
+
+"" --function 1 --instance 7 --dimensions 20
+"" --function 2 --instance 7 --dimensions 20
+"" --function 3 --instance 7 --dimensions 20
+"" --function 4 --instance 7 --dimensions 20
+"" --function 5 --instance 7 --dimensions 20
+"" --function 6 --instance 7 --dimensions 20
+"" --function 7 --instance 7 --dimensions 20
+"" --function 8 --instance 7 --dimensions 20
+"" --function 9 --instance 7 --dimensions 20
+"" --function 10 --instance 7 --dimensions 20
+"" --function 11 --instance 7 --dimensions 20
+"" --function 12 --instance 7 --dimensions 20
+"" --function 13 --instance 7 --dimensions 20
+"" --function 14 --instance 7 --dimensions 20
+"" --function 15 --instance 7 --dimensions 20
+"" --function 16 --instance 7 --dimensions 20
+"" --function 17 --instance 7 --dimensions 20
+"" --function 18 --instance 7 --dimensions 20
+"" --function 19 --instance 7 --dimensions 20
+"" --function 20 --instance 7 --dimensions 20
+"" --function 21 --instance 7 --dimensions 20
+"" --function 22 --instance 7 --dimensions 20
+"" --function 23 --instance 7 --dimensions 20
+"" --function 24 --instance 7 --dimensions 20
