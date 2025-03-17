@@ -22,8 +22,10 @@ The setup for tuning using `irace` can be found in `src/bin/irace_tuning` for th
 and `src/tuning` for the `irace` configuration.
 
 To execute, open a terminal, navigate to the respective subfolder of the algorithmic variant (e.g. `../tuning/pso`)
-and run `irace` (we use the command line option of irace; for more details on that, take a look at the official documentation).
+and run `irace --seed s --log-file log`, where you specify s and log with (we use the command line option of irace;
+for more details on that, take a look at the official documentation).
 
+The results of the irace can be found in the corresponding .Rdata files.
 
 ### Mechanism Comparison
 
@@ -33,9 +35,3 @@ The setup for the comparison of the different strategies with optimized paramete
 The experiments can be run using
 
 cargo run --release experiment_name --function f --dimension --d
-
-
-### Full Examples
-
-If you are interested in details of the results of additional configurations, you can use and adapt the code
-in `src/bin/full_examples`, which evaluates hyperparameter settings individually.

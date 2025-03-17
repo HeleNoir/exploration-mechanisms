@@ -98,7 +98,7 @@ fn main() -> anyhow::Result<()> {
     let termination_value: usize = evaluations as usize;
 
     let folder = format!(
-        "data/PSO_gpgm/d{:?}",
+        "data/PSO_GPGM/d{:?}",
         dimensions
     );
 
