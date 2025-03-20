@@ -40,14 +40,13 @@ struct Args {
     y: u32,
 
     /// Crossover operator; bin or exp
-    #[arg(long, default_value = "bin")]
+    #[arg(long, default_value = "exp")]
     crossover: String,
 
     /// History size, 1 to maximum number of iterations; tuning in 1 to 1000
-    #[arg(long, default_value_t = 100)]
+    #[arg(long, default_value_t = 297)]
     history: usize,
 }
-//TODO Add tuning results as default parameter
 
 fn main() -> anyhow::Result<()> {
     let args = Args::parse();

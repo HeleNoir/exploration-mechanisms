@@ -39,15 +39,15 @@ struct Args {
     population_size: u32,
 
     /// Inertia weight of PSO
-    #[arg(long, default_value_t = 0.9)]
+    #[arg(long, default_value_t = 0.5034)]
     inertia_weight: f64,
 
     /// C1 of PSO
-    #[arg(long, default_value_t = 0.5)]
+    #[arg(long, default_value_t = 1.0519)]
     c1: f64,
 
     /// C2 of PSO
-    #[arg(long, default_value_t = 0.5)]
+    #[arg(long, default_value_t = 2.3403)]
     c2: f64,
 
     /// Exploration condition; evaluations or diversity
@@ -59,14 +59,13 @@ struct Args {
     exp_param: f64,
 
     /// Population size of exploration mechanism, number of individuals that will be replaced; 1 to pop_size
-    #[arg(long, default_value_t = 5)]
+    #[arg(long, default_value_t = 8)]
     new_pop: u32,
 
     /// Solutions to be replaced; best, worst or random
-    #[arg(long, default_value = "best")]
+    #[arg(long, default_value = "worst")]
     replacement: String,
 }
-//TODO Add tuning results as default parameter
 
 fn main() -> anyhow::Result<()> {
     let args = Args::parse();

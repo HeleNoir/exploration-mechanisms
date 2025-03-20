@@ -37,18 +37,17 @@ struct Args {
     population_size: u32,
 
     /// Inertia weight of PSO; 0.0 to 1.0
-    #[arg(long, default_value_t = 0.9)]
+    #[arg(long, default_value_t = 0.5034)]
     inertia_weight: f64,
 
     /// C1 of PSO; 0.0 to 2.5
-    #[arg(long, default_value_t = 0.5)]
+    #[arg(long, default_value_t = 1.0519)]
     c1: f64,
 
     /// C2 of PSO; 0.0 to 2.5
-    #[arg(long, default_value_t = 0.5)]
+    #[arg(long, default_value_t = 2.3403)]
     c2: f64,
 }
-//TODO Add tuning results as default parameter
 
 fn main() -> anyhow::Result<()> {
     let args = Args::parse();
