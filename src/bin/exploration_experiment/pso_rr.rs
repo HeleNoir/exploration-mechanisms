@@ -77,7 +77,7 @@ fn main() -> anyhow::Result<()> {
     // set number of evaluations
     let evaluations: u32 = (10000 * dimensions) as u32;
 
-    let folder = format!("data/PSO_RR/d{:?}_div01", dimensions);
+    let folder = format!("data/PSO_RR/d{:?}", dimensions);
 
     // set number of runs per instance
     let runs: [usize; 25] = (1..=25)
