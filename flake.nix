@@ -4,7 +4,7 @@
 	inputs = {
 		# better use commit
 		nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.05";
-		devenv.url = "github:cachix/devenv";
+		devenv.url = "github:cachix/devenv/v1.3.1";
 		fenix.url = "github:nix-community/fenix";
         fenix.inputs = { nixpkgs.follows = "nixpkgs"; };
 	};
