@@ -59,7 +59,7 @@ struct Args {
     exp_param: f64,
 
     /// Population size of exploration mechanism, number of individuals that will be replaced; 1 to pop_size
-    #[arg(long, default_value_t = 7)]
+    #[arg(long, default_value_t = 28)]
     new_pop: u32,
 
     /// Solutions to be replaced; best, worst or random
@@ -67,7 +67,7 @@ struct Args {
     replacement: String,
 
     /// Solution to be used as center; best, random_new or random_solution
-    #[arg(long, default_value = "random_solution")]
+    #[arg(long, default_value = "best")]
     center: String,
 }
 

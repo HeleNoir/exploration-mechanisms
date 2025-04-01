@@ -59,7 +59,7 @@ struct Args {
     exp_param: f64,
 
     /// Population size of exploration mechanism, number of individuals that will be replaced; 1 to pop_size
-    #[arg(long, default_value_t = 10)]
+    #[arg(long, default_value_t = 33)]
     new_pop: u32,
 
     /// Solutions to be replaced; best, worst or random

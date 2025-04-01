@@ -59,16 +59,16 @@ struct Args {
     exp_param: f64,
 
     /// Population size of exploration mechanism, number of individuals that will be replaced; 1 to pop_size
-    #[arg(long, default_value_t = 15)]
+    #[arg(long, default_value_t = 39)]
     new_pop: u32,
 
     /// Solutions to be replaced; best, worst or random
-    #[arg(long, default_value = "worst")]
+    #[arg(long, default_value = "random")]
     replacement: String,
 
     /// Magnification factor of nuclear reaction mechanism; original between 10^0 and 10^20;
     /// smaller values (probably) lead to more exploration
-    #[arg(long, default_value_t = 615809903.0)]
+    #[arg(long, default_value_t = 356912675.0)]
     mu: f64,
 }
 
